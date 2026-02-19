@@ -49,7 +49,7 @@ app.post('/importar', upload.single('planilha'), (req, res) => {
 
   const caminhoArquivo = req.file.path;
 
-  exec(`python app.py "${caminhoArquivo}"`, (error, stdout, stderr) => {
+  exec(`python3 app.py "${caminhoArquivo}"`, (error, stdout, stderr) => {
 
     console.log('----- PYTHON STDOUT -----');
     console.log(stdout);
@@ -63,7 +63,6 @@ app.post('/importar', upload.single('planilha'), (req, res) => {
       return res.redirect('/?erro=importacao');
     }
 
-    // 👉 SUCESSO
     res.redirect('/?sucesso=1');
   });
 });

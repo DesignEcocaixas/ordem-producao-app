@@ -282,6 +282,6 @@ app.post('/status/:tipo/:id', async (req, res) => {
 });
 
 /* ---------- SERVIDOR ---------- */
-app.listen(3000, () => {
-  console.log('🔥 Sistema rodando em http://localhost:3000');
+app.listen(3051, () => {
+  console.log('🔥 Sistema rodando em http://localhost:3051');
 });

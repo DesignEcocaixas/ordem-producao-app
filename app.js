@@ -42,50 +42,29 @@ app.get('/', async (req, res) => {
 });
 
 
-app.post('/importar', upload.single('planilha'), async (req, res) => {
-  try {
+app.post('/importar', upload.single('planilha'), (req, res) => {
+  if (!req.file) {
+    return res.redirect('/?erro=arquivo');
+  }
 
-    if (!req.file) {
-      return res.redirect('/?erro=arquivo');
+  const caminhoArquivo = req.file.path;
+
+  exec(`python3 app.py "${caminhoArquivo}"`, (error, stdout, stderr) => {
+
+    console.log('----- PYTHON STDOUT -----');
+    console.log(stdout);
+
+    console.log('----- PYTHON STDERR -----');
+    console.log(stderr);
+
+    if (error) {
+      console.error('----- ERRO PYTHON -----');
+      console.error(error);
+      return res.redirect('/?erro=importacao');
     }
 
-    // ===============================
-    // 🔥 LIMPA OS DADOS ANTES DE GERAR
-    // ===============================
-
-    await db.query('TRUNCATE TABLE pedidos_rotativa');
-    await db.query('TRUNCATE TABLE pedidos_flexografica');
-
-    console.log('[LIMPEZA AUTOMÁTICA] Tabelas zeradas antes da importação');
-
-    // ===============================
-    // EXECUTA O PYTHON
-    // ===============================
-
-    const caminhoArquivo = req.file.path;
-
-    exec(`python app.py "${caminhoArquivo}"`, (error, stdout, stderr) => {
-
-      console.log('----- PYTHON STDOUT -----');
-      console.log(stdout);
-
-      console.log('----- PYTHON STDERR -----');
-      console.log(stderr);
-
-      if (error) {
-        console.error('----- ERRO PYTHON -----');
-        console.error(error);
-        return res.redirect('/?erro=importacao');
-      }
-
-      // ✅ SUCESSO
-      res.redirect('/?sucesso=1');
-    });
-
-  } catch (err) {
-    console.error('[ERRO IMPORTAÇÃO]', err);
-    res.redirect('/?erro=importacao');
-  }
+    res.redirect('/?sucesso=1');
+  });
 });
 
 app.post('/limpar', async (req, res) => {

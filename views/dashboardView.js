@@ -435,37 +435,7 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
   </div>
 </div>
 
-<!-- MODAL PROCESSAMENTO -->
-<div class="modal fade" id="modalProcessamento" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
-  <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
 
-      <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">
-          <i class="fa-solid fa-gear fa-spin me-2"></i>
-          Processando Planilha
-        </h5>
-      </div>
-
-      <div class="modal-body">
-
-        <p id="textoEtapa" class="fw-semibold mb-3">
-          Iniciando...
-        </p>
-
-        <div class="progress" style="height: 20px;">
-          <div id="barraProgresso"
-               class="progress-bar progress-bar-striped progress-bar-animated"
-               role="progressbar"
-               style="width: 0%">
-          </div>
-        </div>
-
-      </div>
-
-    </div>
-  </div>
-</div>
 
 
 <!-- Bootstrap JS -->
@@ -604,47 +574,6 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
 
     cards.forEach(card => {
       card.style.display = '';
-    });
-  }
-
-  const formImportar = document.querySelector('form[action="/importar"]');
-
-  if (formImportar) {
-    formImportar.addEventListener('submit', function () {
-
-      const modal = new bootstrap.Modal(
-        document.getElementById('modalProcessamento')
-      );
-
-      modal.show();
-
-      const barra = document.getElementById('barraProgresso');
-      const texto = document.getElementById('textoEtapa');
-
-      let progresso = 0;
-
-      const etapas = [
-        { valor: 25, texto: "Limpando dados antigos..." },
-        { valor: 50, texto: "Processando planilha..." },
-        { valor: 75, texto: "Gerando ordens..." },
-        { valor: 95, texto: "Finalizando..." }
-      ];
-
-      let index = 0;
-
-      const intervalo = setInterval(() => {
-        if (index >= etapas.length) {
-          clearInterval(intervalo);
-          return;
-        }
-
-        progresso = etapas[index].valor;
-        barra.style.width = progresso + "%";
-        texto.innerText = etapas[index].texto;
-
-        index++;
-      }, 800);
-
     });
   }
 </script>

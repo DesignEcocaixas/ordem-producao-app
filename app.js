@@ -100,14 +100,14 @@ app.get('/exportar/rotativa', async (req, res) => {
       { header: 'CLIENTE', key: 'cliente', width: 30 },
       { header: 'QUANTIDADE', key: 'quantidade', width: 15 },
       { header: 'MODELO', key: 'modelo', width: 25 },
-      { header: 'DATA', key: 'previsao_faturamento', width: 15 }
+      { header: 'DATA', key: 'previsao_faturamento', width: 15 },
+      { header: 'OPERADOR', key: 'operador', width: 20 } // 👈 nova coluna manual
     ];
 
     let tamanhoAtual = null;
 
     dados.forEach(d => {
 
-      // Se mudar o tamanho, insere linha em branco
       if (tamanhoAtual !== null && tamanhoAtual !== d.tamanho) {
         sheet.addRow({});
       }
@@ -119,7 +119,8 @@ app.get('/exportar/rotativa', async (req, res) => {
         modelo: d.modelo,
         previsao_faturamento: d.previsao_faturamento
           ? new Date(d.previsao_faturamento)
-          : null
+          : null,
+        operador: '' // 👈 sempre vazio
       });
 
       tamanhoAtual = d.tamanho;
@@ -129,17 +130,17 @@ app.get('/exportar/rotativa', async (req, res) => {
     // ESTILIZAÇÃO
     // =========================
 
-    // Cabeçalho
     const headerRow = sheet.getRow(1);
     headerRow.font = { bold: true };
     headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
-    // Formatar coluna DATA
     sheet.getColumn('previsao_faturamento').numFmt = 'dd/mm/yyyy';
     sheet.getColumn('previsao_faturamento').alignment = { horizontal: 'center' };
 
-    // Centralizar TAMANHO
     sheet.getColumn('tamanho').alignment = { horizontal: 'center' };
+
+    // Centralizar OPERADOR
+    sheet.getColumn('operador').alignment = { horizontal: 'center' };
 
     // =========================
 
@@ -169,8 +170,7 @@ app.get('/exportar/flexografica', async (req, res) => {
        qtd_cores, cor_personalizacao, quantidade,
        status_pedido, previsao_faturamento
     FROM pedidos_flexografica
-    ORDER BY cliente
-`
+    ORDER BY cliente`
   );
 
   const workbook = new ExcelJS.Workbook();
@@ -186,19 +186,22 @@ app.get('/exportar/flexografica', async (req, res) => {
     { header: 'Cor Personalização', key: 'cor_personalizacao', width: 25 },
     { header: 'Quantidade', key: 'quantidade', width: 15 },
     { header: 'Status', key: 'status_pedido', width: 25 },
-    { header: 'Previsão de Faturamento', key: 'previsao_faturamento', width: 25 }
+    { header: 'Previsão de Faturamento', key: 'previsao_faturamento', width: 25 },
+    { header: 'Operador', key: 'operador', width: 20 } // 👈 ficará vazio
   ];
-
 
   let clienteAnterior = null;
 
   dados.forEach(d => {
-    // 🔹 Se mudou o cliente, adiciona linha vazia
     if (clienteAnterior && d.cliente !== clienteAnterior) {
       sheet.addRow({});
     }
 
-    sheet.addRow(d);
+    sheet.addRow({
+      ...d,
+      operador: '' // 👈 força sair vazio
+    });
+
     clienteAnterior = d.cliente;
   });
 

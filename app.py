@@ -50,7 +50,7 @@ def log(tipo, msg, linha=None):
     conn.commit()
 
 # ===============================
-# REGEX DEFINITIVOS
+# REGEX DEFINITIVOS EM CASE SENSITIVE
 # ===============================
 TAMANHO_REGEX = (
     r"\b("

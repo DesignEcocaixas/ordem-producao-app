@@ -87,6 +87,7 @@ app.get('/exportar/rotativa', async (req, res) => {
       SELECT cliente, vendedor, modelo, tamanho, quantidade, previsao_faturamento
       FROM pedidos_rotativa
       ORDER BY 
+        modelo,
         CAST(REGEXP_REPLACE(tamanho, '[^0-9]', '') AS UNSIGNED),
         cliente
     `);
@@ -96,33 +97,49 @@ app.get('/exportar/rotativa', async (req, res) => {
     const sheet = workbook.addWorksheet('Rotativa');
 
     sheet.columns = [
+      { header: 'MODELO', key: 'modelo', width: 25 },
       { header: 'TAMANHO', key: 'tamanho', width: 12 },
       { header: 'CLIENTE', key: 'cliente', width: 30 },
       { header: 'QUANTIDADE', key: 'quantidade', width: 15 },
-      { header: 'MODELO', key: 'modelo', width: 25 },
+      { header: 'VENDEDOR', key: 'vendedor', width: 25 },
       { header: 'DATA', key: 'previsao_faturamento', width: 15 },
-      { header: 'OPERADOR', key: 'operador', width: 20 } // 👈 nova coluna manual
+      { header: 'OPERADOR', key: 'operador', width: 20 } // 👈 NOVA COLUNA
     ];
 
+    let modeloAtual = null;
     let tamanhoAtual = null;
 
     dados.forEach(d => {
 
-      if (tamanhoAtual !== null && tamanhoAtual !== d.tamanho) {
+      if (modeloAtual !== null && modeloAtual !== d.modelo) {
+        sheet.addRow({});
+        sheet.addRow({});
+      }
+
+      if (
+        tamanhoAtual !== null &&
+        tamanhoAtual !== d.tamanho &&
+        modeloAtual === d.modelo
+      ) {
         sheet.addRow({});
       }
 
       sheet.addRow({
-        tamanho: tamanhoAtual === d.tamanho ? '' : d.tamanho,
+        modelo: modeloAtual === d.modelo ? '' : d.modelo,
+        tamanho:
+          tamanhoAtual === d.tamanho && modeloAtual === d.modelo
+            ? ''
+            : d.tamanho,
         cliente: d.cliente,
         quantidade: d.quantidade,
-        modelo: d.modelo,
+        vendedor: d.vendedor,
         previsao_faturamento: d.previsao_faturamento
           ? new Date(d.previsao_faturamento)
           : null,
-        operador: '' // 👈 sempre vazio
+        operador: '' // 👈 vazio para preenchimento manual
       });
 
+      modeloAtual = d.modelo;
       tamanhoAtual = d.tamanho;
     });
 
@@ -134,13 +151,13 @@ app.get('/exportar/rotativa', async (req, res) => {
     headerRow.font = { bold: true };
     headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
 
+    sheet.getColumn('modelo').alignment = { horizontal: 'center' };
+    sheet.getColumn('tamanho').alignment = { horizontal: 'center' };
+
     sheet.getColumn('previsao_faturamento').numFmt = 'dd/mm/yyyy';
     sheet.getColumn('previsao_faturamento').alignment = { horizontal: 'center' };
 
-    sheet.getColumn('tamanho').alignment = { horizontal: 'center' };
-
-    // Centralizar OPERADOR
-    sheet.getColumn('operador').alignment = { horizontal: 'center' };
+    sheet.getColumn('operador').alignment = { horizontal: 'left' };
 
     // =========================
 

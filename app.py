@@ -52,21 +52,23 @@ def log(tipo, msg, linha=None):
 # ===============================
 # REGEX DEFINITIVOS
 # ===============================
-
 TAMANHO_REGEX = (
     r"\b("
-    r"N(?:2\d|3\d|4[0-5])|"
-    r"45|"
-    r"0[1-4]|0|"
-    r"PP[1-3]?|"
-    r"GG|"
-    r"[PMG]|"
-    r"C[1-6]?|"
-    r"G[1-6]|"
-    r"A[1-6]|"
-    r"L[1-2]|"
-    r"\d+\s*MM|"
-    r"\d+\s*CM"
+    r"[Nn](?:20|25|26|30|35|36|40|45)|"        # N20 etc (N ou n)
+    r"0[1-5]|"                                  # 01–05
+    r"[Pp][Pp][1-3]?|"                          # PP, PP1, PP2, PP3
+    r"[Gg][Gg]|"                                # GG
+    r"[PpMmGg]|"                                # P, M, G
+    r"[Cc][1-6]?|"                              # C, C1...
+    r"[Gg][1-7]|"                               # G1–G7
+    r"[Aa][1-6]|"                               # A1–A6
+    r"[Ll][1-2]|"                               # L1, L2
+    r"\d{4,6}|"                                 # 15613 etc
+    r"\d+(?:,\d+)?\s*[Ll]|"                     # 1L, 1l, 1,5L
+    r"[Mm]ini|"                                 # Mini, mini
+    r"[Ee]1|"                                   # E1, e1
+    r"\d+\s*[Mm][Mm]|"                          # 70MM, 70mm
+    r"\d+\s*[Cc][Mm]"                           # 70CM, 70cm
     r")\b"
 )
 

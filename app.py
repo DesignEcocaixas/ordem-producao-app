@@ -35,8 +35,8 @@ if not os.path.exists(arquivo_excel):
 
 conn = mysql.connector.connect(
     host="localhost",
-    user="root",
-    password="1234",
+    user="ordem_user",
+    password="23!Bestdavidx",
     database="ordem_producao"
 )
 

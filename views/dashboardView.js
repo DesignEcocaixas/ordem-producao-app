@@ -1,4 +1,4 @@
-module.exports = function dashboardView(rotativa, flexo, query = {}) {
+module.exports = function dashboardView(rotativa, flexo, query = {}, rotativaNovas = 0, flexoNovas = 0) {
 
   function formatarCor(cor) {
     if (!cor || cor === 'N/D') return 'Não definida';
@@ -68,6 +68,76 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
     .modal.show .modal-dialog {
       transform: translateY(0);
     }
+
+    .footer-fixo {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .sucesso-icone {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: rgba(25, 135, 84, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: popSucesso 0.4s ease;
+    }
+
+    .sucesso-icone i {
+      font-size: 48px;
+      color: #198754;
+    }
+
+    @keyframes popSucesso {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      70% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+
+    .erro-icone {
+      width: 90px;
+      height: 90px;
+      margin: 0 auto;
+      border-radius: 50%;
+      background: rgba(220, 53, 69, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: popErro 0.4s ease;
+    }
+
+    .erro-icone i {
+      font-size: 48px;
+      color: #dc3545;
+    }
+
+    @keyframes popErro {
+      0% {
+        transform: scale(0.5);
+        opacity: 0;
+      }
+      70% {
+        transform: scale(1.1);
+      }
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
   </style>
 </head>
 
@@ -133,34 +203,41 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
 </div>
 
 
-<!-- BOTÕES PRINCIPAIS -->
-<div class="d-flex justify-content-center gap-4 mb-5 flex-wrap">
+<div class="d-flex gap-3 flex-wrap">
 
-  <!-- ROTATIVA / PLANA -->
-  <button class="btn btn-outline-primary d-flex align-items-center justify-content-center gap-2
-                 px-5 py-4"
-          style="min-width: 280px;"
-          data-bs-toggle="modal"
-          data-bs-target="#modalRotativa">
+            <button class="btn btn-outline-primary flex-fill py-3 position-relative"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalRotativa"
+                    onclick="marcarVisualizado('rotativa', this)"
 
-    <i class="fa-solid fa-gears fa-sm"></i>
-    <span class="small fw-semibold">Rotativa / Plana</span>
+              <i class="fa-solid fa-gear me-2"></i>
+              Rotativa / Plana
 
-  </button>
+              ${rotativaNovas > 0 ? `
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  ${rotativaNovas}
+                </span>
+              ` : ''}
 
-  <!-- FLEXOGRÁFICA -->
-  <button class="btn btn-outline-success d-flex align-items-center justify-content-center gap-2
-                 px-5 py-4"
-          style="min-width: 280px;"
-          data-bs-toggle="modal"
-          data-bs-target="#modalFlexo">
+            </button>
 
-    <i class="fa-solid fa-layer-group fa-sm"></i>
-    <span class="small fw-semibold">Flexográfica</span>
+            <button class="btn btn-outline-success flex-fill py-3 position-relative"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalFlexo"
+                    onclick="marcarVisualizado('flexografica', this)">
 
-  </button>
+              <i class="fa-solid fa-layer-group me-2"></i>
+              Flexográfica
 
-</div>
+              ${flexoNovas > 0 ? `
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                  ${flexoNovas}
+                </span>
+              ` : ''}
+
+            </button>
+
+          </div>
 
 
 <div class="modal fade" id="modalRotativa" tabindex="-1">
@@ -376,24 +453,83 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
 <!-- MODAL DE SUCESSO -->
 <div class="modal fade" id="modalSucesso" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
-    <div class="modal-content">
-      <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">✅ Importação concluída</h5>
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <div class="modal-header bg-success text-white border-0">
+        <h5 class="modal-title fw-semibold">
+          <i class="fa-solid fa-circle-check me-2"></i>
+          Importação concluída
+        </h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
-      <div class="modal-body text-center">
-        <p class="fs-5 mb-2">
+
+      <div class="modal-body text-center py-4">
+
+        <!-- Ícone / Imagem de Sucesso -->
+        <div class="mb-3">
+          <div class="sucesso-icone">
+            <i class="fa-solid fa-circle-check"></i>
+          </div>
+        </div>
+
+        <p class="fs-5 fw-semibold mb-2">
           Planilha importada com sucesso!
         </p>
+
         <p class="text-muted mb-0">
           As ordens de produção foram geradas corretamente.
         </p>
+
       </div>
-      <div class="modal-footer">
-        <button class="btn btn-success" data-bs-dismiss="modal">
+
+      <div class="modal-footer border-0 justify-content-center pb-4">
+        <button class="btn btn-success px-4 rounded-pill" data-bs-dismiss="modal">
           OK
         </button>
       </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- MODAL ERRO PLANILHA -->
+<div class="modal fade" id="modalErro" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg rounded-4">
+
+      <div class="modal-header bg-danger text-white border-0">
+        <h5 class="modal-title fw-semibold">
+          <i class="fa-solid fa-triangle-exclamation me-2"></i>
+          Erro na planilha
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body text-center py-4">
+
+        <!-- Ícone / Imagem de Erro -->
+        <div class="mb-3">
+          <div class="erro-icone">
+            <i class="fa-solid fa-circle-xmark"></i>
+          </div>
+        </div>
+
+        <p class="fs-5 fw-semibold mb-2">
+          A planilha enviada é incompatível.
+        </p>
+
+        <p class="text-muted mb-0">
+          Verifique se está usando o modelo correto e tente novamente.
+        </p>
+
+      </div>
+
+      <div class="modal-footer border-0 justify-content-center pb-4">
+        <button class="btn btn-danger px-4 rounded-pill" data-bs-dismiss="modal">
+          Entendi
+        </button>
+      </div>
+
     </div>
   </div>
 </div>
@@ -443,6 +579,32 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
 
 <script>
   const sucesso = ${query.sucesso ? 'true' : 'false'};
+
+if (sucesso) {
+
+  const modalElement = document.getElementById('modalSucesso');
+  const modal = new bootstrap.Modal(modalElement);
+
+  modal.show();
+
+  // 🔥 Quando fechar, remover backdrop manualmente
+  modalElement.addEventListener('hidden.bs.modal', function () {
+
+    document.querySelectorAll('.modal-backdrop')
+      .forEach(el => el.remove());
+
+    document.body.classList.remove('modal-open');
+    document.body.style = '';
+
+  });
+
+  // 🔥 Remove parâmetro da URL
+  if (window.history.replaceState) {
+    const url = new URL(window.location);
+    url.searchParams.delete('sucesso');
+    window.history.replaceState({}, document.title, url.pathname);
+  }
+}
   const erroPlanilha = ${query.erro === 'planilha' ? 'true' : 'false'};
 
   if (erroPlanilha) {
@@ -584,6 +746,22 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
       card.style.display = '';
     });
   }
+
+  function marcarVisualizado(tipo, botao) {
+
+  fetch(\`/notificacao/\${tipo}\`, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+
+      // 🔥 Remove o badge visual sem reload
+      const badge = botao.querySelector('.badge');
+      if (badge) {
+        badge.remove();
+      }
+    })
+    .catch(err => console.error(err));
+}
 </script>
 
 

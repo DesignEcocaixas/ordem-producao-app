@@ -21,7 +21,6 @@ const upload = multer({
   }
 });
 
-/* ---------- VIEW PRINCIPAL ---------- */
 app.get('/', async (req, res) => {
   try {
     const [rotativa] = await db.query(
@@ -32,12 +31,47 @@ app.get('/', async (req, res) => {
       'SELECT * FROM pedidos_flexografica ORDER BY created_at DESC'
     );
 
-    res.send(
-      require('./views/dashboardView')(rotativa, flexo, req.query)
+    const [[rotativaNovas]] = await db.query(
+      'SELECT COUNT(*) as total FROM pedidos_rotativa WHERE notificado = 1'
     );
+
+    const [[flexoNovas]] = await db.query(
+      'SELECT COUNT(*) as total FROM pedidos_flexografica WHERE notificado = 1'
+    );
+
+    res.send(
+      require('./views/dashboardView')(
+        rotativa,
+        flexo,
+        req.query,
+        rotativaNovas.total,
+        flexoNovas.total
+      )
+    );
+
   } catch (err) {
     console.error('[ERRO DASHBOARD]', err);
     res.status(500).send('Erro ao carregar dashboard');
+  }
+});
+
+app.post('/notificacao/:tipo', async (req, res) => {
+  const tipo = req.params.tipo;
+
+  try {
+    if (tipo === 'rotativa') {
+      await db.query('UPDATE pedidos_rotativa SET notificado = 0');
+    }
+
+    if (tipo === 'flexografica') {
+      await db.query('UPDATE pedidos_flexografica SET notificado = 0');
+    }
+
+    res.json({ success: true });
+
+  } catch (err) {
+    console.error('[ERRO NOTIFICACAO]', err);
+    res.json({ success: false });
   }
 });
 

@@ -150,6 +150,23 @@ app.get('/exportar/rotativa', async (req, res) => {
     const ExcelJS = require('exceljs');
     const workbook = new ExcelJS.Workbook();
     const sheet = workbook.addWorksheet('Rotativa');
+    const hoje = new Date();
+    const dataFormatada = hoje.toLocaleDateString('pt-BR');
+
+    // 🔥 CONFIGURAÇÃO DE IMPRESSÃO
+    sheet.pageSetup = {
+      orientation: 'landscape',
+      scale: 95,
+      fitToPage: false,
+      margins: {
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        header: 0,
+        footer: 0
+      }
+    };
 
     sheet.columns = [
       { header: 'MODELO', key: 'modelo', width: 25 },
@@ -158,8 +175,40 @@ app.get('/exportar/rotativa', async (req, res) => {
       { header: 'QUANTIDADE', key: 'quantidade', width: 15 },
       { header: 'VENDEDOR', key: 'vendedor', width: 25 },
       { header: 'DATA', key: 'previsao_faturamento', width: 15 },
-      { header: 'OPERADOR', key: 'operador', width: 20 } // 👈 NOVA COLUNA
+      { header: 'OPERADOR', key: 'operador', width: 20 }
     ];
+
+    // 🔥 INSERE LINHA DE TÍTULO
+    sheet.insertRow(1, []);
+    sheet.mergeCells(1, 1, 1, sheet.columns.length);
+
+    const tituloCell = sheet.getCell('A1');
+    tituloCell.value = `ROTATIVA/PLANA - ${dataFormatada}`;
+    tituloCell.font = { bold: true, size: 14 };
+    tituloCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+    sheet.getRow(1).height = 25;
+
+    // 🔥 ESTILIZA HEADER (AGORA É LINHA 2)
+    const headerRow = sheet.getRow(2);
+
+    headerRow.eachCell(cell => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF0D5749' }
+      };
+
+      cell.font = {
+        bold: true,
+        color: { argb: 'FFFFFFFF' }
+      };
+
+      cell.alignment = {
+        horizontal: 'center',
+        vertical: 'middle'
+      };
+    });
 
     let modeloAtual = null;
     let tamanhoAtual = null;
@@ -191,30 +240,33 @@ app.get('/exportar/rotativa', async (req, res) => {
         previsao_faturamento: d.previsao_faturamento
           ? new Date(d.previsao_faturamento)
           : null,
-        operador: '' // 👈 vazio para preenchimento manual
+        operador: ''
       });
 
       modeloAtual = d.modelo;
       tamanhoAtual = d.tamanho;
     });
 
-    // =========================
-    // ESTILIZAÇÃO
-    // =========================
-
-    const headerRow = sheet.getRow(1);
-    headerRow.font = { bold: true };
-    headerRow.alignment = { horizontal: 'center', vertical: 'middle' };
-
-    sheet.getColumn('modelo').alignment = { horizontal: 'center' };
-    sheet.getColumn('tamanho').alignment = { horizontal: 'center' };
-
+    // 🔥 FORMATA DATA
     sheet.getColumn('previsao_faturamento').numFmt = 'dd/mm/yyyy';
     sheet.getColumn('previsao_faturamento').alignment = { horizontal: 'center' };
 
-    sheet.getColumn('operador').alignment = { horizontal: 'left' };
+    // 🔥 CENTRALIZA COLUNAS IMPORTANTES
+    sheet.getColumn('modelo').alignment = { horizontal: 'center' };
+    sheet.getColumn('tamanho').alignment = { horizontal: 'center' };
+    sheet.getColumn('quantidade').alignment = { horizontal: 'center' };
 
-    // =========================
+    // 🔥 APLICA BORDAS EM TODAS AS CÉLULAS
+    sheet.eachRow((row) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+        };
+      });
+    });
 
     res.setHeader(
       'Content-Type',
@@ -223,7 +275,7 @@ app.get('/exportar/rotativa', async (req, res) => {
 
     res.setHeader(
       'Content-Disposition',
-      'attachment; filename=relatorio-rotativa.xlsx'
+      `attachment; filename=rotativa/plana-${dataFormatada}.xlsx`
     );
 
     await workbook.xlsx.write(res);
@@ -235,53 +287,115 @@ app.get('/exportar/rotativa', async (req, res) => {
   }
 });
 
-
 app.get('/exportar/flexografica', async (req, res) => {
   const [dados] = await db.query(
     `SELECT cliente, vendedor, modelo, tamanho, material,
        qtd_cores, cor_personalizacao, quantidade,
        status_pedido, previsao_faturamento
     FROM pedidos_flexografica
-    ORDER BY cliente
-`
+    ORDER BY cliente`
   );
 
   const workbook = new ExcelJS.Workbook();
   const sheet = workbook.addWorksheet('Flexografica');
+  const hoje = new Date();
+  const dataFormatada = hoje.toLocaleDateString('pt-BR');
+
+  // 🔥 CONFIGURAÇÃO DE IMPRESSÃO
+  sheet.pageSetup = {
+    orientation: 'landscape',
+    scale: 70,
+    fitToPage: false,
+    margins: {
+      left: 0,
+      right: 0,
+      top: 0,
+      bottom: 0,
+      header: 0,
+      footer: 0
+    }
+  };
 
   sheet.columns = [
     { header: 'CLIENTE', key: 'cliente', width: 30 },
-    { header: 'VENDEDOR', key: 'vendedor', width: 20 },
+    { header: 'VENDEDOR', key: 'vendedor', width: 10 },
     { header: 'MODELO', key: 'modelo', width: 20 },
-    { header: 'TAMANHO', key: 'tamanho', width: 8.5 },
-    { header: 'MATERIAL', key: 'material', width: 15 },
+    { header: 'TAMANHO', key: 'tamanho', width: 7 },
+    { header: 'MATERIAL', key: 'material', width: 9 },
     { header: 'QTD CORES', key: 'qtd_cores', width: 9 },
-    { header: 'COR PERSONALIZAÇÃO', key: 'cor_personalizacao', width: 25 },
+    { header: 'COR PERSONALIZAÇÃO', key: 'cor_personalizacao', width: 40 },
     { header: 'QTD', key: 'quantidade', width: 10 },
     { header: 'STATUS', key: 'status_pedido', width: 25 },
-    { header: 'PREV. FATURAMENTO', key: 'previsao_faturamento', width: 25 }
+    { header: 'PREV. FATURAMENTO', key: 'previsao_faturamento', width: 11 },
+    { header: 'OPERADOR', key: 'operador', width: 20 }
   ];
 
+  // 🔥 INSERE LINHA DE TÍTULO ACIMA
+  sheet.insertRow(1, []);
+  sheet.mergeCells(1, 1, 1, sheet.columns.length);
+  const tituloCell = sheet.getCell('A1');
+  tituloCell.value = `FLEXOGRAFICA - ${dataFormatada}`;
+  tituloCell.font = { bold: true, size: 14 };
+  tituloCell.alignment = { horizontal: 'center', vertical: 'middle' };
+
+  sheet.getRow(1).height = 25;
+
+  // 🔥 ESTILIZA HEADER (AGORA É LINHA 2)
+  const headerRow = sheet.getRow(2);
+
+  headerRow.eachCell(cell => {
+    cell.fill = {
+      type: 'pattern',
+      pattern: 'solid',
+      fgColor: { argb: 'FF0D5749' }
+    };
+
+    cell.font = {
+      bold: true,
+      color: { argb: 'FFFFFFFF' }
+    };
+
+    cell.alignment = {
+      horizontal: 'center',
+      vertical: 'middle'
+    };
+  });
 
   let clienteAnterior = null;
 
   dados.forEach(d => {
-    // 🔹 Se mudou o cliente, adiciona linha vazia
     if (clienteAnterior && d.cliente !== clienteAnterior) {
       sheet.addRow({});
     }
 
-    sheet.addRow(d);
+    sheet.addRow({
+      ...d,
+      operador: ''
+    });
+
     clienteAnterior = d.cliente;
+  });
+
+  // 🔥 APLICA BORDAS EM TODAS AS CÉLULAS
+  sheet.eachRow((row, rowNumber) => {
+    row.eachCell(cell => {
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
   });
 
   res.setHeader(
     'Content-Type',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
   );
+
   res.setHeader(
     'Content-Disposition',
-    'attachment; filename=flexografica.xlsx'
+    `attachment; filename=flexografica-${dataFormatada}.xlsx`
   );
 
   await workbook.xlsx.write(res);

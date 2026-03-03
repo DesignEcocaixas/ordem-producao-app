@@ -63,11 +63,6 @@ app.post('/notificacao/:tipo', async (req, res) => {
       await db.query('UPDATE pedidos_rotativa SET notificado = 0');
     }
 
-app.post('/importar', upload.single('planilha'), (req, res) => {
-  if (!req.file) {
-    return res.redirect('/?erro=arquivo');
-  }
-
     if (tipo === 'flexografica') {
       await db.query('UPDATE pedidos_flexografica SET notificado = 0');
     }

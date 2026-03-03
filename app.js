@@ -63,11 +63,6 @@ app.post('/notificacao/:tipo', async (req, res) => {
       await db.query('UPDATE pedidos_rotativa SET notificado = 0');
     }
 
-app.post('/importar', upload.single('planilha'), (req, res) => {
-  if (!req.file) {
-    return res.redirect('/?erro=arquivo');
-  }
-
     if (tipo === 'flexografica') {
       await db.query('UPDATE pedidos_flexografica SET notificado = 0');
     }
@@ -79,7 +74,6 @@ app.post('/importar', upload.single('planilha'), (req, res) => {
     res.json({ success: false });
   }
 });
-
 
 app.post('/importar', upload.single('planilha'), async (req, res) => {
   try {
@@ -248,7 +242,8 @@ app.get('/exportar/flexografica', async (req, res) => {
        qtd_cores, cor_personalizacao, quantidade,
        status_pedido, previsao_faturamento
     FROM pedidos_flexografica
-    ORDER BY cliente`
+    ORDER BY cliente
+`
   );
 
   const workbook = new ExcelJS.Workbook();
@@ -267,18 +262,16 @@ app.get('/exportar/flexografica', async (req, res) => {
     { header: 'PREV. FATURAMENTO', key: 'previsao_faturamento', width: 25 }
   ];
 
+
   let clienteAnterior = null;
 
   dados.forEach(d => {
+    // 🔹 Se mudou o cliente, adiciona linha vazia
     if (clienteAnterior && d.cliente !== clienteAnterior) {
       sheet.addRow({});
     }
 
-    sheet.addRow({
-      ...d,
-      operador: '' // 👈 força sair vazio
-    });
-
+    sheet.addRow(d);
     clienteAnterior = d.cliente;
   });
 

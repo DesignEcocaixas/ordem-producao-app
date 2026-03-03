@@ -443,6 +443,14 @@ module.exports = function dashboardView(rotativa, flexo, query = {}) {
 
 <script>
   const sucesso = ${query.sucesso ? 'true' : 'false'};
+  const erroPlanilha = ${query.erro === 'planilha' ? 'true' : 'false'};
+
+  if (erroPlanilha) {
+    const modalErro = new bootstrap.Modal(
+      document.getElementById('modalErro')
+    );
+    modalErro.show();
+  }
 
   if (sucesso) {
     const modal = new bootstrap.Modal(

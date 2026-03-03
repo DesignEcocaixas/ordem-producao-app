@@ -42,29 +42,51 @@ app.get('/', async (req, res) => {
 });
 
 
-app.post('/importar', upload.single('planilha'), (req, res) => {
-  if (!req.file) {
-    return res.redirect('/?erro=arquivo');
-  }
+app.post('/importar', upload.single('planilha'), async (req, res) => {
+  try {
 
-  const caminhoArquivo = req.file.path;
-
-  exec(`python3 app.py "${caminhoArquivo}"`, (error, stdout, stderr) => {
-
-    console.log('----- PYTHON STDOUT -----');
-    console.log(stdout);
-
-    console.log('----- PYTHON STDERR -----');
-    console.log(stderr);
-
-    if (error) {
-      console.error('----- ERRO PYTHON -----');
-      console.error(error);
-      return res.redirect('/?erro=importacao');
+    if (!req.file) {
+      return res.redirect('/?erro=arquivo');
     }
 
-    res.redirect('/?sucesso=1');
-  });
+    const caminhoArquivo = req.file.path;
+
+    exec(`python app.py "${caminhoArquivo}"`, async (error, stdout, stderr) => {
+
+      console.log('----- PYTHON STDOUT -----');
+      console.log(stdout);
+
+      console.log('----- PYTHON STDERR -----');
+      console.log(stderr);
+
+      // ❌ Se Python retornar erro
+      if (error || stdout.includes("Erro:")) {
+
+        console.error('----- ERRO NA IMPORTAÇÃO -----');
+        console.error(error || stdout);
+
+        try {
+          // 🔥 LIMPA APENAS SE DER ERRO
+          await db.query('TRUNCATE TABLE pedidos_rotativa');
+          await db.query('TRUNCATE TABLE pedidos_flexografica');
+
+          console.log('[ROLLBACK] Dados removidos devido a erro na planilha');
+        } catch (dbError) {
+          console.error('[ERRO AO LIMPAR APÓS FALHA]', dbError);
+        }
+
+        return res.redirect('/?erro=planilha');
+      }
+
+      // ✅ SUCESSO (não limpa nada)
+      return res.redirect('/?sucesso=1');
+
+    });
+
+  } catch (err) {
+    console.error('[ERRO IMPORTAÇÃO]', err);
+    res.redirect('/?erro=importacao');
+  }
 });
 
 app.post('/limpar', async (req, res) => {

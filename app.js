@@ -85,7 +85,7 @@ app.post('/importar', upload.single('planilha'), async (req, res) => {
 
     const caminhoArquivo = req.file.path;
 
-    exec(`python app.py "${caminhoArquivo}"`, async (error, stdout, stderr) => {
+    exec(`python3 app.py "${caminhoArquivo}"`, async (error, stdout, stderr) => {
 
       console.log('----- PYTHON STDOUT -----');
       console.log(stdout);
@@ -250,17 +250,16 @@ app.get('/exportar/flexografica', async (req, res) => {
   const sheet = workbook.addWorksheet('Flexografica');
 
   sheet.columns = [
-    { header: 'Cliente', key: 'cliente', width: 30 },
-    { header: 'Vendedor', key: 'vendedor', width: 20 },
-    { header: 'Modelo', key: 'modelo', width: 30 },
-    { header: 'Tamanho', key: 'tamanho', width: 12 },
-    { header: 'Material', key: 'material', width: 15 },
-    { header: 'Qtd Cores', key: 'qtd_cores', width: 12 },
-    { header: 'Cor Personalização', key: 'cor_personalizacao', width: 25 },
-    { header: 'Quantidade', key: 'quantidade', width: 15 },
-    { header: 'Status', key: 'status_pedido', width: 25 },
-    { header: 'Previsão de Faturamento', key: 'previsao_faturamento', width: 25 },
-    { header: 'Operador', key: 'operador', width: 20 } // 👈 ficará vazio
+    { header: 'CLIENTE', key: 'cliente', width: 30 },
+    { header: 'VENDEDOR', key: 'vendedor', width: 20 },
+    { header: 'MODELO', key: 'modelo', width: 20 },
+    { header: 'TAMANHO', key: 'tamanho', width: 8.5 },
+    { header: 'MATERIAL', key: 'material', width: 15 },
+    { header: 'QTD CORES', key: 'qtd_cores', width: 9 },
+    { header: 'COR PERSONALIZAÇÃO', key: 'cor_personalizacao', width: 25 },
+    { header: 'QTD', key: 'quantidade', width: 10 },
+    { header: 'STATUS', key: 'status_pedido', width: 25 },
+    { header: 'PREV. FATURAMENTO', key: 'previsao_faturamento', width: 25 }
   ];
 
   let clienteAnterior = null;

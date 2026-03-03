@@ -36,6 +36,34 @@ module.exports = function dashboardView(rotativa, flexo, query = {}, rotativaNov
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
+  html, body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  background-color: #e9ecef;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* Granulado */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1; /* 🔥 IMPORTANTE */
+  background-image:
+    radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px),
+    radial-gradient(rgba(0,0,0,0.15) 1px, transparent 1px);
+  background-size: 3px 3px;
+  background-position: 0 0, 1.5px 1.5px;
+  opacity: 0.35;
+}
+
     .btn-area {
       display: flex;
       gap: 16px;
@@ -138,70 +166,81 @@ module.exports = function dashboardView(rotativa, flexo, query = {}, rotativaNov
         opacity: 1;
       }
     }
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
   </style>
 </head>
 
-<body class="bg-light">
+<body>
 
-<div class="container my-5">
+<div class="flex-grow-1">
 
-  <!-- TÍTULO -->
-  <div class="border rounded p-3 mb-4 text-start">
-    <h2 class="mb-0">
-      <i class="fa-solid fa-clipboard-list me-2 text-primary"></i>
-      Ordens de Produção
-    </h2>
-  </div>
+<div class="container my-5 position-relative" style="z-index:1;">
 
-  <!-- BLOCO DE AÇÕES -->
-  <div class="border rounded p-4">
+  <div class="row align-items-center g-5">
 
-    <div class="d-flex justify-content-center align-items-end gap-3">
+    <!-- LADO ESQUERDO -->
+    <div class="col-lg-6">
 
-  <!-- IMPORTAR / GERAR -->
-  <form action="/importar" method="POST" enctype="multipart/form-data"
-        class="d-inline-flex align-items-end gap-2">
+      <div class="pe-lg-4">
 
-    <div>
-      <label class="form-label mb-1 fw-semibold">
-        <i class="fa-solid fa-file-excel me-1 text-success"></i>
-        Planilha
-      </label>
-      <input
-        type="file"
-        name="planilha"
-        accept=".xlsx,.xls"
-        class="form-control"
-        required
-      >
+        <h1 class="fw-bold mb-3">
+          <i class="fa-solid fa-industry text-primary me-2"></i>
+          Ordens de Produção
+        </h1>
+
+        <p class="text-muted fs-5">
+          Sistema para gerenciamento das produções
+          Rotativa, Plana e Flexográfica.
+        </p>
+
+        <p class="text-muted">
+          Importe planilhas em Excel, gere automaticamente as ordens
+          e acompanhe o andamento da produção de forma organizada.
+        </p>
+
+      </div>
+
     </div>
 
-    <button class="btn btn-primary px-4">
-      <i class="fa-solid fa-file-lines me-1"></i>
-      Gerar
-    </button>
 
-  </form>
+    <!-- LADO DIREITO -->
+    <div class="col-lg-6">
 
-  <!-- LIMPAR -->
-  <form action="/limpar" method="POST"
-        class="d-inline-flex align-items-end"
-        onsubmit="return confirm('Tem certeza que deseja excluir TODOS os cards?')">
+      <div class="border border-secondary-subtle p-4 bg-white">
 
-    <button class="btn btn-outline-danger px-4">
-      <i class="fa-solid fa-trash-can me-1"></i>
-      Limpar
-    </button>
+        <h5 class="fw-semibold mb-4">
+          Gerenciar Produção
+        </h5>
 
-  </form>
+        <!-- IMPORTAR -->
+        <form action="/importar" method="POST" enctype="multipart/form-data">
 
-</div>
+          <label class="form-label fw-semibold">
+            Selecionar Planilha
+          </label>
 
+          <input
+            type="file"
+            name="planilha"
+            accept=".xlsx,.xls"
+            class="form-control mb-4"
+            required
+          >
 
-  </div>
+          <!-- BOTÕES LADO A LADO -->
+          <div class="d-flex gap-3 mb-4">
 
-</div>
+            <button class="btn btn-primary w-50">
+              Gerar Ordens
+            </button>
 
+        </form>
 
 <div class="d-flex gap-3 flex-wrap">
 
@@ -228,7 +267,47 @@ module.exports = function dashboardView(rotativa, flexo, query = {}, rotativaNov
 
               <i class="fa-solid fa-layer-group me-2"></i>
               Flexográfica
+        <form action="/limpar"
+              method="POST"
+              class="w-50"
+              onsubmit="return confirm('Tem certeza que deseja excluir TODOS os cards?')">
 
+            <button class="btn btn-outline-danger w-100">
+              Limpar
+            </button>
+
+        </form>
+
+          </div>
+
+          <!-- BOTÕES PRINCIPAIS -->
+          <div class="d-flex gap-3 flex-wrap">
+
+            <button class="btn btn-outline-primary flex-fill py-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalRotativa">
+
+              <i class="fa-solid fa-gear me-2"></i>
+              Rotativa / Plana
+
+            </button>
+
+            <button class="btn btn-outline-success flex-fill py-3"
+                    data-bs-toggle="modal"
+                    data-bs-target="#modalFlexo">
+
+              <i class="fa-solid fa-layer-group me-2"></i>
+              Flexográfica
+
+            </button>
+
+          </div>
+
+      </div>
+
+    </div>
+
+  </div>
               ${flexoNovas > 0 ? `
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   ${flexoNovas}
@@ -571,7 +650,37 @@ module.exports = function dashboardView(rotativa, flexo, query = {}, rotativaNov
   </div>
 </div>
 
+<!-- MODAL PROCESSAMENTO -->
+<div class="modal fade" id="modalProcessamento" tabindex="-1" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
 
+      <div class="modal-header bg-primary text-white">
+        <h5 class="modal-title">
+          <i class="fa-solid fa-gear fa-spin me-2"></i>
+          Processando Planilha
+        </h5>
+      </div>
+
+      <div class="modal-body">
+
+        <p id="textoEtapa" class="fw-semibold mb-3">
+          Iniciando...
+        </p>
+
+        <div class="progress" style="height: 20px;">
+          <div id="barraProgresso"
+               class="progress-bar progress-bar-striped progress-bar-animated"
+               role="progressbar"
+               style="width: 0%">
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
 
 
 <!-- Bootstrap JS -->
@@ -764,8 +873,56 @@ if (sucesso) {
 }
 </script>
 
+  const formImportar = document.querySelector('form[action="/importar"]');
 
+  if (formImportar) {
+    formImportar.addEventListener('submit', function () {
+
+      const modal = new bootstrap.Modal(
+        document.getElementById('modalProcessamento')
+      );
+
+      modal.show();
+
+      const barra = document.getElementById('barraProgresso');
+      const texto = document.getElementById('textoEtapa');
+
+      let progresso = 0;
+
+      const etapas = [
+        { valor: 25, texto: "Limpando dados antigos..." },
+        { valor: 50, texto: "Processando planilha..." },
+        { valor: 75, texto: "Gerando ordens..." },
+        { valor: 95, texto: "Finalizando..." }
+      ];
+
+      let index = 0;
+
+      const intervalo = setInterval(() => {
+        if (index >= etapas.length) {
+          clearInterval(intervalo);
+          return;
+        }
+
+        progresso = etapas[index].valor;
+        barra.style.width = progresso + "%";
+        texto.innerText = etapas[index].texto;
+
+        index++;
+      }, 800);
+
+    });
+  }
+</script>
+
+<footer class="bg-dark text-light py-3 border-top border-secondary footer-fixo">
+  <div class="container text-center small text-secondary">
+    <span class="text-light fw-semibold">71dev</span> © 2026 —
+    Todos os direitos reservados
+  </div>
+</footer>
 </body>
 </html>
 `;
 };
+

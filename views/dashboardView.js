@@ -98,74 +98,6 @@ body::before {
     }
 
     .footer-fixo {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      z-index: 1000;
-    }
-
-    .sucesso-icone {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto;
-      border-radius: 50%;
-      background: rgba(25, 135, 84, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: popSucesso 0.4s ease;
-    }
-
-    .sucesso-icone i {
-      font-size: 48px;
-      color: #198754;
-    }
-
-    @keyframes popSucesso {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      70% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
-
-    .erro-icone {
-      width: 90px;
-      height: 90px;
-      margin: 0 auto;
-      border-radius: 50%;
-      background: rgba(220, 53, 69, 0.1);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: popErro 0.4s ease;
-    }
-
-    .erro-icone i {
-      font-size: 48px;
-      color: #dc3545;
-    }
-
-    @keyframes popErro {
-      0% {
-        transform: scale(0.5);
-        opacity: 0;
-      }
-      70% {
-        transform: scale(1.1);
-      }
-      100% {
-        transform: scale(1);
-        opacity: 1;
-      }
-    }
   position: fixed;
   bottom: 0;
   left: 0;
@@ -173,6 +105,67 @@ body::before {
   z-index: 1000;
 }
 
+.sucesso-icone {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(25, 135, 84, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popSucesso 0.4s ease;
+}
+
+.sucesso-icone i {
+  font-size: 48px;
+  color: #198754;
+}
+
+@keyframes popSucesso {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.erro-icone {
+  width: 90px;
+  height: 90px;
+  margin: 0 auto;
+  border-radius: 50%;
+  background: rgba(220, 53, 69, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: popErro 0.4s ease;
+}
+
+.erro-icone i {
+  font-size: 48px;
+  color: #dc3545;
+}
+
+@keyframes popErro {
+  0% {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
   </style>
 </head>
 
@@ -242,12 +235,25 @@ body::before {
 
         </form>
 
-<div class="d-flex gap-3 flex-wrap">
+        <form action="/limpar"
+              method="POST"
+              class="w-50"
+              onsubmit="return confirm('Tem certeza que deseja excluir TODOS os cards?')">
+
+            <button class="btn btn-outline-danger w-100">
+              Limpar Todas
+            </button>
+
+        </form>
+
+          </div>
+
+          <div class="d-flex gap-3 flex-wrap">
 
             <button class="btn btn-outline-primary flex-fill py-3 position-relative"
                     data-bs-toggle="modal"
                     data-bs-target="#modalRotativa"
-                    onclick="marcarVisualizado('rotativa', this)"
+                    onclick="marcarVisualizado('rotativa', this)">
 
               <i class="fa-solid fa-gear me-2"></i>
               Rotativa / Plana
@@ -267,47 +273,7 @@ body::before {
 
               <i class="fa-solid fa-layer-group me-2"></i>
               Flexográfica
-        <form action="/limpar"
-              method="POST"
-              class="w-50"
-              onsubmit="return confirm('Tem certeza que deseja excluir TODOS os cards?')">
 
-            <button class="btn btn-outline-danger w-100">
-              Limpar
-            </button>
-
-        </form>
-
-          </div>
-
-          <!-- BOTÕES PRINCIPAIS -->
-          <div class="d-flex gap-3 flex-wrap">
-
-            <button class="btn btn-outline-primary flex-fill py-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalRotativa">
-
-              <i class="fa-solid fa-gear me-2"></i>
-              Rotativa / Plana
-
-            </button>
-
-            <button class="btn btn-outline-success flex-fill py-3"
-                    data-bs-toggle="modal"
-                    data-bs-target="#modalFlexo">
-
-              <i class="fa-solid fa-layer-group me-2"></i>
-              Flexográfica
-
-            </button>
-
-          </div>
-
-      </div>
-
-    </div>
-
-  </div>
               ${flexoNovas > 0 ? `
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                   ${flexoNovas}
@@ -318,12 +284,20 @@ body::before {
 
           </div>
 
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
 
 <div class="modal fade" id="modalRotativa" tabindex="-1">
   <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-primary text-white">
-        <h5 class="modal-title">🔵 Produção Rotativa / Plana</h5>
+        <h5 class="modal-title">Produção Rotativa / Plana</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
@@ -413,7 +387,7 @@ body::before {
   <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-header bg-success text-white">
-        <h5 class="modal-title">🟢 Produção Flexográfica</h5>
+        <h5 class="modal-title">Produção Flexográfica</h5>
         <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
       </div>
 
@@ -717,11 +691,11 @@ if (sucesso) {
   const erroPlanilha = ${query.erro === 'planilha' ? 'true' : 'false'};
 
   if (erroPlanilha) {
-    const modalErro = new bootstrap.Modal(
-      document.getElementById('modalErro')
-    );
-    modalErro.show();
-  }
+  const modalErro = new bootstrap.Modal(
+    document.getElementById('modalErro')
+  );
+  modalErro.show();
+}
 
   if (sucesso) {
     const modal = new bootstrap.Modal(
@@ -856,23 +830,6 @@ if (sucesso) {
     });
   }
 
-  function marcarVisualizado(tipo, botao) {
-
-  fetch(\`/notificacao/\${tipo}\`, { method: 'POST' })
-    .then(res => res.json())
-    .then(data => {
-      if (!data.success) return;
-
-      // 🔥 Remove o badge visual sem reload
-      const badge = botao.querySelector('.badge');
-      if (badge) {
-        badge.remove();
-      }
-    })
-    .catch(err => console.error(err));
-}
-</script>
-
   const formImportar = document.querySelector('form[action="/importar"]');
 
   if (formImportar) {
@@ -913,6 +870,22 @@ if (sucesso) {
 
     });
   }
+
+  function marcarVisualizado(tipo, botao) {
+
+  fetch(\`/notificacao/\${tipo}\`, { method: 'POST' })
+    .then(res => res.json())
+    .then(data => {
+      if (!data.success) return;
+
+      // 🔥 Remove o badge visual sem reload
+      const badge = botao.querySelector('.badge');
+      if (badge) {
+        badge.remove();
+      }
+    })
+    .catch(err => console.error(err));
+}
 </script>
 
 <footer class="bg-dark text-light py-3 border-top border-secondary footer-fixo">

@@ -84,7 +84,12 @@ app.post('/importar', upload.single('planilha'), async (req, res) => {
 
     const caminhoArquivo = req.file.path;
 
-    exec(`python3 app.py "${caminhoArquivo}"`, async (error, stdout, stderr) => {
+    const pythonPath =
+      process.platform === "win32"
+        ? `"C:\\Python313\\python.exe"`
+        : "python3";
+
+    exec(`${pythonPath} app.py "${caminhoArquivo}"`, async (error, stdout, stderr) => {
 
       console.log('----- PYTHON STDOUT -----');
       console.log(stdout);
@@ -129,7 +134,8 @@ app.post('/limpar', async (req, res) => {
 
     console.log('[LIMPEZA] Todos os pedidos foram removidos');
 
-    res.redirect('/');
+    // 🔥 ATUALIZAÇÃO AQUI: Passando o parâmetro na URL
+    res.redirect('/?limpo=1');
   } catch (err) {
     console.error('[ERRO LIMPEZA]', err);
     res.status(500).send('Erro ao limpar os dados');

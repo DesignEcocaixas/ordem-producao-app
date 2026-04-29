@@ -34,11 +34,18 @@ if not os.path.exists(arquivo_excel):
 # ===============================
 
 conn = mysql.connector.connect(
-    host="localhost",
+   host="localhost",
     user="ordem_user",
     password="23!Bestdavidx",
     database="ordem_producao"
 )
+
+#conn = mysql.connector.connect(
+#    host="localhost",
+#    user="root",
+#    password="1234",
+#    database="ordem_producao"
+#)
 
 cursor = conn.cursor()
 
